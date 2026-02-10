@@ -1,0 +1,1865 @@
+Directory structure:
+└── spotify_to_tidal/
+    ├── readme.md
+    ├── example_config.yml
+    ├── GEMINI.md
+    ├── LICENSE
+    ├── pyproject.toml
+    ├── pytest.ini
+    ├── src/
+    │   └── spotify_to_tidal/
+    │       ├── __main__.py
+    │       ├── auth.py
+    │       ├── cache.py
+    │       ├── sync.py
+    │       ├── tidalapi_patch.py
+    │       └── type/
+    │           ├── __init__.py
+    │           ├── config.py
+    │           └── spotify.py
+    └── tests/
+        ├── conftest.py
+        └── unit/
+            ├── __init__.py
+            ├── test_auth.py
+            └── test_cache.py
+
+================================================
+FILE: readme.md
+================================================
+A command line tool for importing your Spotify playlists into Tidal. Due to various performance optimisations, it is particularly suited for periodic synchronisation of very large collections.
+
+Installation
+-----------
+Clone this git repository and then run:
+
+```bash
+python3 -m pip install -e .
+```
+
+Setup
+-----
+0. Rename the file example_config.yml to config.yml
+0. Go [here](https://developer.spotify.com/documentation/general/guides/authorization/app-settings/) and register a new app on developer.spotify.com.
+0. Copy and paste your client ID and client secret to the Spotify part of the config file
+0. Copy and paste the value in 'redirect_uri' of the config file to Redirect URIs at developer.spotify.com and press ADD
+0. Enter your Spotify username to the config file
+
+Usage
+----
+To synchronize all of your Spotify playlists with your Tidal account run the following from the project root directory
+Windows ignores python module paths by default, but you can run them using `python3 -m spotify_to_tidal`
+
+```bash
+spotify_to_tidal
+```
+
+You can also just synchronize a specific playlist by doing the following:
+
+```bash
+spotify_to_tidal --uri 1ABCDEqsABCD6EaABCDa0a # accepts playlist id or full playlist uri
+```
+
+or sync just your 'Liked Songs' with:
+
+```bash
+spotify_to_tidal --sync-favorites
+```
+
+See example_config.yml for more configuration options, and `spotify_to_tidal --help` for more options.
+
+---
+
+#### Join our amazing community as a code contributor
+<br><br>
+<a href="https://github.com/spotify2tidal/spotify_to_tidal/graphs/contributors">
+  <img class="dark-light" src="https://contrib.rocks/image?repo=spotify2tidal/spotify_to_tidal&anon=0&columns=25&max=100&r=true" />
+</a>
+
+
+
+================================================
+FILE: example_config.yml
+================================================
+spotify:
+  client_id: your_client_id
+  client_secret: your_client_secret
+  username: your_spotify_username
+  redirect_uri: http://127.0.0.1:8888/callback
+  open_browser: True # Set to False if using a headless server environment
+
+
+# uncomment this block if you want to only sync specific playlist IDs
+#sync_playlists:
+#  - spotify_id: 1ABCDEqsABCD6EaABCDa0a
+#    tidal_id: a0b1234-0a1b-012a-abcd-a1b234c5d6d7
+
+# uncomment this block if you want to sync all playlists in the account with some exceptions
+#excluded_playlists:
+#  - spotify:playlist:1ABCDEqsABCD6EaABCDa0a
+
+# default setting for syncing favorites when no command line arguments are provided
+#   - when true:  favorites will be synced by default (overriden when any command line arg provided)
+#   - when false: favorites can only be synced manually via --sync-favorites argument
+sync_favorites_default: true
+
+# increasing these parameters should increase the search speed, while decreasing reduces likelihood of 429 errors
+max_concurrency: 10 # max concurrent connections at any given time
+rate_limit:      10 # max sustained connections per second
+
+
+
+================================================
+FILE: GEMINI.md
+================================================
+[Empty file]
+
+
+================================================
+FILE: LICENSE
+================================================
+                    GNU AFFERO GENERAL PUBLIC LICENSE
+                       Version 3, 19 November 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+                            Preamble
+
+  The GNU Affero General Public License is a free, copyleft license for
+software and other kinds of works, specifically designed to ensure
+cooperation with the community in the case of network server software.
+
+  The licenses for most software and other practical works are designed
+to take away your freedom to share and change the works.  By contrast,
+our General Public Licenses are intended to guarantee your freedom to
+share and change all versions of a program--to make sure it remains free
+software for all its users.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+them if you wish), that you receive source code or can get it if you
+want it, that you can change the software or use pieces of it in new
+free programs, and that you know you can do these things.
+
+  Developers that use our General Public Licenses protect your rights
+with two steps: (1) assert copyright on the software, and (2) offer
+you this License which gives you legal permission to copy, distribute
+and/or modify the software.
+
+  A secondary benefit of defending all users' freedom is that
+improvements made in alternate versions of the program, if they
+receive widespread use, become available for other developers to
+incorporate.  Many developers of free software are heartened and
+encouraged by the resulting cooperation.  However, in the case of
+software used on network servers, this result may fail to come about.
+The GNU General Public License permits making a modified version and
+letting the public access it on a server without ever releasing its
+source code to the public.
+
+  The GNU Affero General Public License is designed specifically to
+ensure that, in such cases, the modified source code becomes available
+to the community.  It requires the operator of a network server to
+provide the source code of the modified version running there to the
+users of that server.  Therefore, public use of a modified version, on
+a publicly accessible server, gives the public access to the source
+code of the modified version.
+
+  An older license, called the Affero General Public License and
+published by Affero, was designed to accomplish similar goals.  This is
+a different license, not a version of the Affero GPL, but Affero has
+released a new version of the Affero GPL which permits relicensing under
+this license.
+
+  The precise terms and conditions for copying, distribution and
+modification follow.
+
+                       TERMS AND CONDITIONS
+
+  0. Definitions.
+
+  "This License" refers to version 3 of the GNU Affero General Public License.
+
+  "Copyright" also means copyright-like laws that apply to other kinds of
+works, such as semiconductor masks.
+
+  "The Program" refers to any copyrightable work licensed under this
+License.  Each licensee is addressed as "you".  "Licensees" and
+"recipients" may be individuals or organizations.
+
+  To "modify" a work means to copy from or adapt all or part of the work
+in a fashion requiring copyright permission, other than the making of an
+exact copy.  The resulting work is called a "modified version" of the
+earlier work or a work "based on" the earlier work.
+
+  A "covered work" means either the unmodified Program or a work based
+on the Program.
+
+  To "propagate" a work means to do anything with it that, without
+permission, would make you directly or secondarily liable for
+infringement under applicable copyright law, except executing it on a
+computer or modifying a private copy.  Propagation includes copying,
+distribution (with or without modification), making available to the
+public, and in some countries other activities as well.
+
+  To "convey" a work means any kind of propagation that enables other
+parties to make or receive copies.  Mere interaction with a user through
+a computer network, with no transfer of a copy, is not conveying.
+
+  An interactive user interface displays "Appropriate Legal Notices"
+to the extent that it includes a convenient and prominently visible
+feature that (1) displays an appropriate copyright notice, and (2)
+tells the user that there is no warranty for the work (except to the
+extent that warranties are provided), that licensees may convey the
+work under this License, and how to view a copy of this License.  If
+the interface presents a list of user commands or options, such as a
+menu, a prominent item in the list meets this criterion.
+
+  1. Source Code.
+
+  The "source code" for a work means the preferred form of the work
+for making modifications to it.  "Object code" means any non-source
+form of a work.
+
+  A "Standard Interface" means an interface that either is an official
+standard defined by a recognized standards body, or, in the case of
+interfaces specified for a particular programming language, one that
+is widely used among developers working in that language.
+
+  The "System Libraries" of an executable work include anything, other
+than the work as a whole, that (a) is included in the normal form of
+packaging a Major Component, but which is not part of that Major
+Component, and (b) serves only to enable use of the work with that
+Major Component, or to implement a Standard Interface for which an
+implementation is available to the public in source code form.  A
+"Major Component", in this context, means a major essential component
+(kernel, window system, and so on) of the specific operating system
+(if any) on which the executable work runs, or a compiler used to
+produce the work, or an object code interpreter used to run it.
+
+  The "Corresponding Source" for a work in object code form means all
+the source code needed to generate, install, and (for an executable
+work) run the object code and to modify the work, including scripts to
+control those activities.  However, it does not include the work's
+System Libraries, or general-purpose tools or generally available free
+programs which are used unmodified in performing those activities but
+which are not part of the work.  For example, Corresponding Source
+includes interface definition files associated with source files for
+the work, and the source code for shared libraries and dynamically
+linked subprograms that the work is specifically designed to require,
+such as by intimate data communication or control flow between those
+subprograms and other parts of the work.
+
+  The Corresponding Source need not include anything that users
+can regenerate automatically from other parts of the Corresponding
+Source.
+
+  The Corresponding Source for a work in source code form is that
+same work.
+
+  2. Basic Permissions.
+
+  All rights granted under this License are granted for the term of
+copyright on the Program, and are irrevocable provided the stated
+conditions are met.  This License explicitly affirms your unlimited
+permission to run the unmodified Program.  The output from running a
+covered work is covered by this License only if the output, given its
+content, constitutes a covered work.  This License acknowledges your
+rights of fair use or other equivalent, as provided by copyright law.
+
+  You may make, run and propagate covered works that you do not
+convey, without conditions so long as your license otherwise remains
+in force.  You may convey covered works to others for the sole purpose
+of having them make modifications exclusively for you, or provide you
+with facilities for running those works, provided that you comply with
+the terms of this License in conveying all material for which you do
+not control copyright.  Those thus making or running the covered works
+for you must do so exclusively on your behalf, under your direction
+and control, on terms that prohibit them from making any copies of
+your copyrighted material outside their relationship with you.
+
+  Conveying under any other circumstances is permitted solely under
+the conditions stated below.  Sublicensing is not allowed; section 10
+makes it unnecessary.
+
+  3. Protecting Users' Legal Rights From Anti-Circumvention Law.
+
+  No covered work shall be deemed part of an effective technological
+measure under any applicable law fulfilling obligations under article
+11 of the WIPO copyright treaty adopted on 20 December 1996, or
+similar laws prohibiting or restricting circumvention of such
+measures.
+
+  When you convey a covered work, you waive any legal power to forbid
+circumvention of technological measures to the extent such circumvention
+is effected by exercising rights under this License with respect to
+the covered work, and you disclaim any intention to limit operation or
+modification of the work as a means of enforcing, against the work's
+users, your or third parties' legal rights to forbid circumvention of
+technological measures.
+
+  4. Conveying Verbatim Copies.
+
+  You may convey verbatim copies of the Program's source code as you
+receive it, in any medium, provided that you conspicuously and
+appropriately publish on each copy an appropriate copyright notice;
+keep intact all notices stating that this License and any
+non-permissive terms added in accord with section 7 apply to the code;
+keep intact all notices of the absence of any warranty; and give all
+recipients a copy of this License along with the Program.
+
+  You may charge any price or no price for each copy that you convey,
+and you may offer support or warranty protection for a fee.
+
+  5. Conveying Modified Source Versions.
+
+  You may convey a work based on the Program, or the modifications to
+produce it from the Program, in the form of source code under the
+terms of section 4, provided that you also meet all of these conditions:
+
+    a) The work must carry prominent notices stating that you modified
+    it, and giving a relevant date.
+
+    b) The work must carry prominent notices stating that it is
+    released under this License and any conditions added under section
+    7.  This requirement modifies the requirement in section 4 to
+    "keep intact all notices".
+
+    c) You must license the entire work, as a whole, under this
+    License to anyone who comes into possession of a copy.  This
+    License will therefore apply, along with any applicable section 7
+    additional terms, to the whole of the work, and all its parts,
+    regardless of how they are packaged.  This License gives no
+    permission to license the work in any other way, but it does not
+    invalidate such permission if you have separately received it.
+
+    d) If the work has interactive user interfaces, each must display
+    Appropriate Legal Notices; however, if the Program has interactive
+    interfaces that do not display Appropriate Legal Notices, your
+    work need not make them do so.
+
+  A compilation of a covered work with other separate and independent
+works, which are not by their nature extensions of the covered work,
+and which are not combined with it such as to form a larger program,
+in or on a volume of a storage or distribution medium, is called an
+"aggregate" if the compilation and its resulting copyright are not
+used to limit the access or legal rights of the compilation's users
+beyond what the individual works permit.  Inclusion of a covered work
+in an aggregate does not cause this License to apply to the other
+parts of the aggregate.
+
+  6. Conveying Non-Source Forms.
+
+  You may convey a covered work in object code form under the terms
+of sections 4 and 5, provided that you also convey the
+machine-readable Corresponding Source under the terms of this License,
+in one of these ways:
+
+    a) Convey the object code in, or embodied in, a physical product
+    (including a physical distribution medium), accompanied by the
+    Corresponding Source fixed on a durable physical medium
+    customarily used for software interchange.
+
+    b) Convey the object code in, or embodied in, a physical product
+    (including a physical distribution medium), accompanied by a
+    written offer, valid for at least three years and valid for as
+    long as you offer spare parts or customer support for that product
+    model, to give anyone who possesses the object code either (1) a
+    copy of the Corresponding Source for all the software in the
+    product that is covered by this License, on a durable physical
+    medium customarily used for software interchange, for a price no
+    more than your reasonable cost of physically performing this
+    conveying of source, or (2) access to copy the
+    Corresponding Source from a network server at no charge.
+
+    c) Convey individual copies of the object code with a copy of the
+    written offer to provide the Corresponding Source.  This
+    alternative is allowed only occasionally and noncommercially, and
+    only if you received the object code with such an offer, in accord
+    with subsection 6b.
+
+    d) Convey the object code by offering access from a designated
+    place (gratis or for a charge), and offer equivalent access to the
+    Corresponding Source in the same way through the same place at no
+    further charge.  You need not require recipients to copy the
+    Corresponding Source along with the object code.  If the place to
+    copy the object code is a network server, the Corresponding Source
+    may be on a different server (operated by you or a third party)
+    that supports equivalent copying facilities, provided you maintain
+    clear directions next to the object code saying where to find the
+    Corresponding Source.  Regardless of what server hosts the
+    Corresponding Source, you remain obligated to ensure that it is
+    available for as long as needed to satisfy these requirements.
+
+    e) Convey the object code using peer-to-peer transmission, provided
+    you inform other peers where the object code and Corresponding
+    Source of the work are being offered to the general public at no
+    charge under subsection 6d.
+
+  A separable portion of the object code, whose source code is excluded
+from the Corresponding Source as a System Library, need not be
+included in conveying the object code work.
+
+  A "User Product" is either (1) a "consumer product", which means any
+tangible personal property which is normally used for personal, family,
+or household purposes, or (2) anything designed or sold for incorporation
+into a dwelling.  In determining whether a product is a consumer product,
+doubtful cases shall be resolved in favor of coverage.  For a particular
+product received by a particular user, "normally used" refers to a
+typical or common use of that class of product, regardless of the status
+of the particular user or of the way in which the particular user
+actually uses, or expects or is expected to use, the product.  A product
+is a consumer product regardless of whether the product has substantial
+commercial, industrial or non-consumer uses, unless such uses represent
+the only significant mode of use of the product.
+
+  "Installation Information" for a User Product means any methods,
+procedures, authorization keys, or other information required to install
+and execute modified versions of a covered work in that User Product from
+a modified version of its Corresponding Source.  The information must
+suffice to ensure that the continued functioning of the modified object
+code is in no case prevented or interfered with solely because
+modification has been made.
+
+  If you convey an object code work under this section in, or with, or
+specifically for use in, a User Product, and the conveying occurs as
+part of a transaction in which the right of possession and use of the
+User Product is transferred to the recipient in perpetuity or for a
+fixed term (regardless of how the transaction is characterized), the
+Corresponding Source conveyed under this section must be accompanied
+by the Installation Information.  But this requirement does not apply
+if neither you nor any third party retains the ability to install
+modified object code on the User Product (for example, the work has
+been installed in ROM).
+
+  The requirement to provide Installation Information does not include a
+requirement to continue to provide support service, warranty, or updates
+for a work that has been modified or installed by the recipient, or for
+the User Product in which it has been modified or installed.  Access to a
+network may be denied when the modification itself materially and
+adversely affects the operation of the network or violates the rules and
+protocols for communication across the network.
+
+  Corresponding Source conveyed, and Installation Information provided,
+in accord with this section must be in a format that is publicly
+documented (and with an implementation available to the public in
+source code form), and must require no special password or key for
+unpacking, reading or copying.
+
+  7. Additional Terms.
+
+  "Additional permissions" are terms that supplement the terms of this
+License by making exceptions from one or more of its conditions.
+Additional permissions that are applicable to the entire Program shall
+be treated as though they were included in this License, to the extent
+that they are valid under applicable law.  If additional permissions
+apply only to part of the Program, that part may be used separately
+under those permissions, but the entire Program remains governed by
+this License without regard to the additional permissions.
+
+  When you convey a copy of a covered work, you may at your option
+remove any additional permissions from that copy, or from any part of
+it.  (Additional permissions may be written to require their own
+removal in certain cases when you modify the work.)  You may place
+additional permissions on material, added by you to a covered work,
+for which you have or can give appropriate copyright permission.
+
+  Notwithstanding any other provision of this License, for material you
+add to a covered work, you may (if authorized by the copyright holders of
+that material) supplement the terms of this License with terms:
+
+    a) Disclaiming warranty or limiting liability differently from the
+    terms of sections 15 and 16 of this License; or
+
+    b) Requiring preservation of specified reasonable legal notices or
+    author attributions in that material or in the Appropriate Legal
+    Notices displayed by works containing it; or
+
+    c) Prohibiting misrepresentation of the origin of that material, or
+    requiring that modified versions of such material be marked in
+    reasonable ways as different from the original version; or
+
+    d) Limiting the use for publicity purposes of names of licensors or
+    authors of the material; or
+
+    e) Declining to grant rights under trademark law for use of some
+    trade names, trademarks, or service marks; or
+
+    f) Requiring indemnification of licensors and authors of that
+    material by anyone who conveys the material (or modified versions of
+    it) with contractual assumptions of liability to the recipient, for
+    any liability that these contractual assumptions directly impose on
+    those licensors and authors.
+
+  All other non-permissive additional terms are considered "further
+restrictions" within the meaning of section 10.  If the Program as you
+received it, or any part of it, contains a notice stating that it is
+governed by this License along with a term that is a further
+restriction, you may remove that term.  If a license document contains
+a further restriction but permits relicensing or conveying under this
+License, you may add to a covered work material governed by the terms
+of that license document, provided that the further restriction does
+not survive such relicensing or conveying.
+
+  If you add terms to a covered work in accord with this section, you
+must place, in the relevant source files, a statement of the
+additional terms that apply to those files, or a notice indicating
+where to find the applicable terms.
+
+  Additional terms, permissive or non-permissive, may be stated in the
+form of a separately written license, or stated as exceptions;
+the above requirements apply either way.
+
+  8. Termination.
+
+  You may not propagate or modify a covered work except as expressly
+provided under this License.  Any attempt otherwise to propagate or
+modify it is void, and will automatically terminate your rights under
+this License (including any patent licenses granted under the third
+paragraph of section 11).
+
+  However, if you cease all violation of this License, then your
+license from a particular copyright holder is reinstated (a)
+provisionally, unless and until the copyright holder explicitly and
+finally terminates your license, and (b) permanently, if the copyright
+holder fails to notify you of the violation by some reasonable means
+prior to 60 days after the cessation.
+
+  Moreover, your license from a particular copyright holder is
+reinstated permanently if the copyright holder notifies you of the
+violation by some reasonable means, this is the first time you have
+received notice of violation of this License (for any work) from that
+copyright holder, and you cure the violation prior to 30 days after
+your receipt of the notice.
+
+  Termination of your rights under this section does not terminate the
+licenses of parties who have received copies or rights from you under
+this License.  If your rights have been terminated and not permanently
+reinstated, you do not qualify to receive new licenses for the same
+material under section 10.
+
+  9. Acceptance Not Required for Having Copies.
+
+  You are not required to accept this License in order to receive or
+run a copy of the Program.  Ancillary propagation of a covered work
+occurring solely as a consequence of using peer-to-peer transmission
+to receive a copy likewise does not require acceptance.  However,
+nothing other than this License grants you permission to propagate or
+modify any covered work.  These actions infringe copyright if you do
+not accept this License.  Therefore, by modifying or propagating a
+covered work, you indicate your acceptance of this License to do so.
+
+  10. Automatic Licensing of Downstream Recipients.
+
+  Each time you convey a covered work, the recipient automatically
+receives a license from the original licensors, to run, modify and
+propagate that work, subject to this License.  You are not responsible
+for enforcing compliance by third parties with this License.
+
+  An "entity transaction" is a transaction transferring control of an
+organization, or substantially all assets of one, or subdividing an
+organization, or merging organizations.  If propagation of a covered
+work results from an entity transaction, each party to that
+transaction who receives a copy of the work also receives whatever
+licenses to the work the party's predecessor in interest had or could
+give under the previous paragraph, plus a right to possession of the
+Corresponding Source of the work from the predecessor in interest, if
+the predecessor has it or can get it with reasonable efforts.
+
+  You may not impose any further restrictions on the exercise of the
+rights granted or affirmed under this License.  For example, you may
+not impose a license fee, royalty, or other charge for exercise of
+rights granted under this License, and you may not initiate litigation
+(including a cross-claim or counterclaim in a lawsuit) alleging that
+any patent claim is infringed by making, using, selling, offering for
+sale, or importing the Program or any portion of it.
+
+  11. Patents.
+
+  A "contributor" is a copyright holder who authorizes use under this
+License of the Program or a work on which the Program is based.  The
+work thus licensed is called the contributor's "contributor version".
+
+  A contributor's "essential patent claims" are all patent claims
+owned or controlled by the contributor, whether already acquired or
+hereafter acquired, that would be infringed by some manner, permitted
+by this License, of making, using, or selling its contributor version,
+but do not include claims that would be infringed only as a
+consequence of further modification of the contributor version.  For
+purposes of this definition, "control" includes the right to grant
+patent sublicenses in a manner consistent with the requirements of
+this License.
+
+  Each contributor grants you a non-exclusive, worldwide, royalty-free
+patent license under the contributor's essential patent claims, to
+make, use, sell, offer for sale, import and otherwise run, modify and
+propagate the contents of its contributor version.
+
+  In the following three paragraphs, a "patent license" is any express
+agreement or commitment, however denominated, not to enforce a patent
+(such as an express permission to practice a patent or covenant not to
+sue for patent infringement).  To "grant" such a patent license to a
+party means to make such an agreement or commitment not to enforce a
+patent against the party.
+
+  If you convey a covered work, knowingly relying on a patent license,
+and the Corresponding Source of the work is not available for anyone
+to copy, free of charge and under the terms of this License, through a
+publicly available network server or other readily accessible means,
+then you must either (1) cause the Corresponding Source to be so
+available, or (2) arrange to deprive yourself of the benefit of the
+patent license for this particular work, or (3) arrange, in a manner
+consistent with the requirements of this License, to extend the patent
+license to downstream recipients.  "Knowingly relying" means you have
+actual knowledge that, but for the patent license, your conveying the
+covered work in a country, or your recipient's use of the covered work
+in a country, would infringe one or more identifiable patents in that
+country that you have reason to believe are valid.
+
+  If, pursuant to or in connection with a single transaction or
+arrangement, you convey, or propagate by procuring conveyance of, a
+covered work, and grant a patent license to some of the parties
+receiving the covered work authorizing them to use, propagate, modify
+or convey a specific copy of the covered work, then the patent license
+you grant is automatically extended to all recipients of the covered
+work and works based on it.
+
+  A patent license is "discriminatory" if it does not include within
+the scope of its coverage, prohibits the exercise of, or is
+conditioned on the non-exercise of one or more of the rights that are
+specifically granted under this License.  You may not convey a covered
+work if you are a party to an arrangement with a third party that is
+in the business of distributing software, under which you make payment
+to the third party based on the extent of your activity of conveying
+the work, and under which the third party grants, to any of the
+parties who would receive the covered work from you, a discriminatory
+patent license (a) in connection with copies of the covered work
+conveyed by you (or copies made from those copies), or (b) primarily
+for and in connection with specific products or compilations that
+contain the covered work, unless you entered into that arrangement,
+or that patent license was granted, prior to 28 March 2007.
+
+  Nothing in this License shall be construed as excluding or limiting
+any implied license or other defenses to infringement that may
+otherwise be available to you under applicable patent law.
+
+  12. No Surrender of Others' Freedom.
+
+  If conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot convey a
+covered work so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you may
+not convey it at all.  For example, if you agree to terms that obligate you
+to collect a royalty for further conveying from those to whom you convey
+the Program, the only way you could satisfy both those terms and this
+License would be to refrain entirely from conveying the Program.
+
+  13. Remote Network Interaction; Use with the GNU General Public License.
+
+  Notwithstanding any other provision of this License, if you modify the
+Program, your modified version must prominently offer all users
+interacting with it remotely through a computer network (if your version
+supports such interaction) an opportunity to receive the Corresponding
+Source of your version by providing access to the Corresponding Source
+from a network server at no charge, through some standard or customary
+means of facilitating copying of software.  This Corresponding Source
+shall include the Corresponding Source for any work covered by version 3
+of the GNU General Public License that is incorporated pursuant to the
+following paragraph.
+
+  Notwithstanding any other provision of this License, you have
+permission to link or combine any covered work with a work licensed
+under version 3 of the GNU General Public License into a single
+combined work, and to convey the resulting work.  The terms of this
+License will continue to apply to the part which is the covered work,
+but the work with which it is combined will remain governed by version
+3 of the GNU General Public License.
+
+  14. Revised Versions of this License.
+
+  The Free Software Foundation may publish revised and/or new versions of
+the GNU Affero General Public License from time to time.  Such new versions
+will be similar in spirit to the present version, but may differ in detail to
+address new problems or concerns.
+
+  Each version is given a distinguishing version number.  If the
+Program specifies that a certain numbered version of the GNU Affero General
+Public License "or any later version" applies to it, you have the
+option of following the terms and conditions either of that numbered
+version or of any later version published by the Free Software
+Foundation.  If the Program does not specify a version number of the
+GNU Affero General Public License, you may choose any version ever published
+by the Free Software Foundation.
+
+  If the Program specifies that a proxy can decide which future
+versions of the GNU Affero General Public License can be used, that proxy's
+public statement of acceptance of a version permanently authorizes you
+to choose that version for the Program.
+
+  Later license versions may give you additional or different
+permissions.  However, no additional obligations are imposed on any
+author or copyright holder as a result of your choosing to follow a
+later version.
+
+  15. Disclaimer of Warranty.
+
+  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
+OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+  16. Limitation of Liability.
+
+  IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+  17. Interpretation of Sections 15 and 16.
+
+  If the disclaimer of warranty and limitation of liability provided
+above cannot be given local legal effect according to their terms,
+reviewing courts shall apply local law that most closely approximates
+an absolute waiver of all civil liability in connection with the
+Program, unless a warranty or assumption of liability accompanies a
+copy of the Program in return for a fee.
+
+                     END OF TERMS AND CONDITIONS
+
+            How to Apply These Terms to Your New Programs
+
+  If you develop a new program, and you want it to be of the greatest
+possible use to the public, the best way to achieve this is to make it
+free software which everyone can redistribute and change under these terms.
+
+  To do so, attach the following notices to the program.  It is safest
+to attach them to the start of each source file to most effectively
+state the exclusion of warranty; and each file should have at least
+the "copyright" line and a pointer to where the full notice is found.
+
+    <one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) <year>  <name of author>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Also add information on how to contact you by electronic and paper mail.
+
+  If your software can interact with users remotely through a computer
+network, you should also make sure that it provides a way for users to
+get its source.  For example, if your program is a web application, its
+interface could display a "Source" link that leads users to an archive
+of the code.  There are many ways you could offer source, and different
+solutions will be better for different programs; see section 13 for the
+specific requirements.
+
+  You should also get your employer (if you work as a programmer) or school,
+if any, to sign a "copyright disclaimer" for the program, if necessary.
+For more information on this, and how to apply and follow the GNU AGPL, see
+<https://www.gnu.org/licenses/>.
+
+
+
+================================================
+FILE: pyproject.toml
+================================================
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spotify_to_tidal"
+version = "1.0.4"
+requires-python = ">= 3.10"
+
+dependencies = [
+  "spotipy~=2.24.0",
+  "tidalapi==0.7.6",
+  "pyyaml~=6.0",
+  "tqdm~=4.64",
+  "sqlalchemy~=2.0",
+  "pytest~=8.0",
+  "pytest-mock~=3.8"
+]
+
+[tools.setuptools.packages."spotify_to_tidal"]
+where = "src"
+include = "spotify_to_tidal*"
+
+[project.scripts]
+spotify_to_tidal = "spotify_to_tidal.__main__:main"
+
+
+
+================================================
+FILE: pytest.ini
+================================================
+[pytest]
+addopts = --maxfail=1 --disable-warnings
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+
+
+================================================
+FILE: src/spotify_to_tidal/__main__.py
+================================================
+import yaml
+import argparse
+import sys
+
+from . import sync as _sync
+from . import auth as _auth
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', default='config.yml', help='location of the config file')
+    parser.add_argument('--uri', help='synchronize a specific URI instead of the one in the config')
+    parser.add_argument('--sync-favorites', action=argparse.BooleanOptionalAction, help='synchronize the favorites')
+    args = parser.parse_args()
+
+    with open(args.config, 'r') as f:
+        config = yaml.safe_load(f)
+    print("Opening Spotify session")
+    spotify_session = _auth.open_spotify_session(config['spotify'])
+    print("Opening Tidal session")
+    tidal_session = _auth.open_tidal_session()
+    if not tidal_session.check_login():
+        sys.exit("Could not connect to Tidal")
+    if args.uri:
+        # if a playlist ID is explicitly provided as a command line argument then use that
+        spotify_playlist = spotify_session.playlist(args.uri)
+        tidal_playlists = _sync.get_tidal_playlists_wrapper(tidal_session)
+        tidal_playlist = _sync.pick_tidal_playlist_for_spotify_playlist(spotify_playlist, tidal_playlists)
+        _sync.sync_playlists_wrapper(spotify_session, tidal_session, [tidal_playlist], config)
+        sync_favorites = args.sync_favorites # only sync favorites if command line argument explicitly passed
+    elif args.sync_favorites:
+        sync_favorites = True # sync only the favorites
+    elif config.get('sync_playlists', None):
+        # if the config contains a sync_playlists list of mappings then use that
+        _sync.sync_playlists_wrapper(spotify_session, tidal_session, _sync.get_playlists_from_config(spotify_session, tidal_session, config), config)
+        sync_favorites = args.sync_favorites is None and config.get('sync_favorites_default', True)
+    else:
+        # otherwise sync all the user playlists in the Spotify account and favorites unless explicitly disabled
+        _sync.sync_playlists_wrapper(spotify_session, tidal_session, _sync.get_user_playlist_mappings(spotify_session, tidal_session, config), config)
+        sync_favorites = args.sync_favorites is None and config.get('sync_favorites_default', True)
+
+    if sync_favorites:
+        _sync.sync_favorites_wrapper(spotify_session, tidal_session, config)
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
+
+
+
+================================================
+FILE: src/spotify_to_tidal/auth.py
+================================================
+#!/usr/bin/env python3
+
+import sys
+import spotipy
+import tidalapi
+import webbrowser
+import yaml
+
+__all__ = [
+    'open_spotify_session',
+    'open_tidal_session'
+]
+
+SPOTIFY_SCOPES = 'playlist-read-private, user-library-read'
+
+def open_spotify_session(config) -> spotipy.Spotify:
+    credentials_manager = spotipy.SpotifyOAuth(username=config['username'],
+       scope=SPOTIFY_SCOPES,
+       client_id=config['client_id'],
+       client_secret=config['client_secret'],
+       redirect_uri=config['redirect_uri'],
+       requests_timeout=2,
+       open_browser=config.get('open_browser', True))
+    try:
+        credentials_manager.get_access_token(as_dict=False)
+    except spotipy.SpotifyOauthError:
+        sys.exit("Error opening Spotify sesion; could not get token for username: ".format(config['username']))
+
+    return spotipy.Spotify(oauth_manager=credentials_manager)
+
+def open_tidal_session(config = None) -> tidalapi.Session:
+    try:
+        with open('.session.yml', 'r') as session_file:
+            previous_session = yaml.safe_load(session_file)
+    except OSError:
+        previous_session = None
+
+    if config:
+        session = tidalapi.Session(config=config)
+    else:
+        session = tidalapi.Session()
+    if previous_session:
+        try:
+            if session.load_oauth_session(token_type= previous_session['token_type'],
+                                   access_token=previous_session['access_token'],
+                                   refresh_token=previous_session['refresh_token'] ):
+                return session
+        except Exception as e:
+            print("Error loading previous Tidal Session: \n" + str(e) )
+
+    login, future = session.login_oauth()
+    print('Login with the webbrowser: ' + login.verification_uri_complete)
+    url = login.verification_uri_complete
+    if not url.startswith('https://'):
+        url = 'https://' + url
+    webbrowser.open(url)
+    future.result()
+    with open('.session.yml', 'w') as f:
+        yaml.dump( {'session_id': session.session_id,
+                   'token_type': session.token_type,
+                   'access_token': session.access_token,
+                   'refresh_token': session.refresh_token}, f )
+    return session
+
+
+
+
+
+================================================
+FILE: src/spotify_to_tidal/cache.py
+================================================
+import datetime
+import sqlalchemy
+from sqlalchemy import Table, Column, String, DateTime, MetaData, insert, select, update, delete
+from typing import Dict, List, Sequence, Set, Mapping
+
+
+class MatchFailureDatabase:
+    """ 
+    sqlite database of match failures which persists between runs
+    this can be used concurrently between multiple processes
+    """
+
+    def __init__(self, filename='.cache.db'):
+        self.engine = sqlalchemy.create_engine(f"sqlite:///{filename}")
+        meta = MetaData()
+        self.match_failures = Table('match_failures', meta,
+                                    Column('track_id', String,
+                                           primary_key=True),
+                                    Column('insert_time', DateTime),
+                                    Column('next_retry', DateTime),
+                                    sqlite_autoincrement=False)
+        meta.create_all(self.engine)
+
+    def _get_next_retry_time(self, insert_time: datetime.datetime | None = None) -> datetime.datetime:
+        if insert_time:
+            # double interval on each retry
+            interval = 2 * (datetime.datetime.now() - insert_time)
+        else:
+            interval = datetime.timedelta(days=7)
+        return datetime.datetime.now() + interval
+
+    def cache_match_failure(self, track_id: str):
+        """ notifies that matching failed for the given track_id """
+        fetch_statement = select(self.match_failures).where(
+            self.match_failures.c.track_id == track_id)
+        with self.engine.connect() as connection:
+            with connection.begin():
+                # Either update the next_retry time if track_id already exists, otherwise create a new entry
+                existing_failure = connection.execute(
+                    fetch_statement).fetchone()
+                if existing_failure:
+                    update_statement = update(self.match_failures).where(
+                        self.match_failures.c.track_id == track_id).values(next_retry=self._get_next_retry_time())
+                    connection.execute(update_statement)
+                else:
+                    connection.execute(insert(self.match_failures), {
+                                       "track_id": track_id, "insert_time": datetime.datetime.now(), "next_retry": self._get_next_retry_time()})
+
+    def has_match_failure(self, track_id: str) -> bool:
+        """ checks if there was a recent search for which matching failed with the given track_id """
+        statement = select(self.match_failures.c.next_retry).where(
+            self.match_failures.c.track_id == track_id)
+        with self.engine.connect() as connection:
+            match_failure = connection.execute(statement).fetchone()
+            if match_failure:
+                return match_failure.next_retry > datetime.datetime.now()
+            return False
+
+    def remove_match_failure(self, track_id: str):
+        """ removes match failure from the database """
+        statement = delete(self.match_failures).where(
+            self.match_failures.c.track_id == track_id)
+        with self.engine.connect() as connection:
+            with connection.begin():
+                connection.execute(statement)
+
+
+class TrackMatchCache:
+    """
+    Non-persistent mapping of spotify ids -> tidal_ids
+    This should NOT be accessed concurrently from multiple processes
+    """
+    data: Dict[str, int] = {}
+
+    def get(self, track_id: str) -> int | None:
+        return self.data.get(track_id, None)
+
+    def insert(self, mapping: tuple[str, int]):
+        self.data[mapping[0]] = mapping[1]
+
+
+# Main singleton instance
+failure_cache = MatchFailureDatabase()
+track_match_cache = TrackMatchCache()
+
+
+
+================================================
+FILE: src/spotify_to_tidal/sync.py
+================================================
+#!/usr/bin/env python3
+
+import asyncio
+from .cache import failure_cache, track_match_cache
+import datetime
+from difflib import SequenceMatcher
+from functools import partial
+from typing import Callable, List, Sequence, Set, Mapping
+import math
+import requests
+import sys
+import spotipy
+import tidalapi
+from .tidalapi_patch import add_multiple_tracks_to_playlist, clear_tidal_playlist, get_all_favorites, get_all_playlists, get_all_playlist_tracks
+import time
+from tqdm.asyncio import tqdm as atqdm
+from tqdm import tqdm
+import traceback
+import unicodedata
+import math
+
+from .type import spotify as t_spotify
+
+def normalize(s) -> str:
+    return unicodedata.normalize('NFD', s).encode('ascii', 'ignore').decode('ascii')
+
+def simple(input_string: str) -> str:
+    # only take the first part of a string before any hyphens or brackets to account for different versions
+    return input_string.split('-')[0].strip().split('(')[0].strip().split('[')[0].strip()
+
+def isrc_match(tidal_track: tidalapi.Track, spotify_track) -> bool:
+    if "isrc" in spotify_track["external_ids"]:
+        return tidal_track.isrc == spotify_track["external_ids"]["isrc"]
+    return False
+
+def duration_match(tidal_track: tidalapi.Track, spotify_track, tolerance=2) -> bool:
+    # the duration of the two tracks must be the same to within 2 seconds
+    return abs(tidal_track.duration - spotify_track['duration_ms']/1000) < tolerance
+
+def name_match(tidal_track, spotify_track) -> bool:
+    def exclusion_rule(pattern: str, tidal_track: tidalapi.Track, spotify_track: t_spotify.SpotifyTrack):
+        spotify_has_pattern = pattern in spotify_track['name'].lower()
+        tidal_has_pattern = pattern in tidal_track.name.lower() or (not tidal_track.version is None and (pattern in tidal_track.version.lower()))
+        return spotify_has_pattern != tidal_has_pattern
+
+    # handle some edge cases
+    if exclusion_rule("instrumental", tidal_track, spotify_track): return False
+    if exclusion_rule("acapella", tidal_track, spotify_track): return False
+    if exclusion_rule("remix", tidal_track, spotify_track): return False
+
+    # the simplified version of the Spotify track name must be a substring of the Tidal track name
+    # Try with both un-normalized and then normalized
+    simple_spotify_track = simple(spotify_track['name'].lower()).split('feat.')[0].strip()
+    return simple_spotify_track in tidal_track.name.lower() or normalize(simple_spotify_track) in normalize(tidal_track.name.lower())
+
+def artist_match(tidal: tidalapi.Track | tidalapi.Album, spotify) -> bool:
+    def split_artist_name(artist: str) -> Sequence[str]:
+       if '&' in artist:
+           return artist.split('&')
+       elif ',' in artist:
+           return artist.split(',')
+       else:
+           return [artist]
+
+    def get_tidal_artists(tidal: tidalapi.Track | tidalapi.Album, do_normalize=False) -> Set[str]:
+        result: list[str] = []
+        for artist in tidal.artists:
+            if do_normalize:
+                artist_name = normalize(artist.name)
+            else:
+                artist_name = artist.name
+            result.extend(split_artist_name(artist_name))
+        return set([simple(x.strip().lower()) for x in result])
+
+    def get_spotify_artists(spotify, do_normalize=False) -> Set[str]:
+        result: list[str] = []
+        for artist in spotify['artists']:
+            if do_normalize:
+                artist_name = normalize(artist['name'])
+            else:
+                artist_name = artist['name']
+            result.extend(split_artist_name(artist_name))
+        return set([simple(x.strip().lower()) for x in result])
+    # There must be at least one overlapping artist between the Tidal and Spotify track
+    # Try with both un-normalized and then normalized
+    if get_tidal_artists(tidal).intersection(get_spotify_artists(spotify)) != set():
+        return True
+    return get_tidal_artists(tidal, True).intersection(get_spotify_artists(spotify, True)) != set()
+
+def match(tidal_track, spotify_track) -> bool:
+    if not spotify_track['id']: return False
+    return isrc_match(tidal_track, spotify_track) or (
+        duration_match(tidal_track, spotify_track)
+        and name_match(tidal_track, spotify_track)
+        and artist_match(tidal_track, spotify_track)
+    )
+
+def test_album_similarity(spotify_album, tidal_album, threshold=0.6):
+    return SequenceMatcher(None, simple(spotify_album['name']), simple(tidal_album.name)).ratio() >= threshold and artist_match(tidal_album, spotify_album)
+
+async def tidal_search(spotify_track, rate_limiter, tidal_session: tidalapi.Session) -> tidalapi.Track | None:
+    def _search_for_track_in_album():
+        # search for album name and first album artist
+        if 'album' in spotify_track and 'artists' in spotify_track['album'] and len(spotify_track['album']['artists']):
+            query = simple(spotify_track['album']['name']) + " " + simple(spotify_track['album']['artists'][0]['name'])
+            album_result = tidal_session.search(query, models=[tidalapi.album.Album])
+            for album in album_result['albums']:
+                if album.num_tracks >= spotify_track['track_number'] and test_album_similarity(spotify_track['album'], album):
+                    album_tracks = album.tracks()
+                    if len(album_tracks) < spotify_track['track_number']:
+                        assert( not len(album_tracks) == album.num_tracks ) # incorrect metadata :(
+                        continue
+                    track = album_tracks[spotify_track['track_number'] - 1]
+                    if match(track, spotify_track):
+                        failure_cache.remove_match_failure(spotify_track['id'])
+                        return track
+
+    def _search_for_standalone_track():
+        # if album search fails then search for track name and first artist
+        query = simple(spotify_track['name']) + ' ' + simple(spotify_track['artists'][0]['name'])
+        for track in tidal_session.search(query, models=[tidalapi.media.Track])['tracks']:
+            if match(track, spotify_track):
+                failure_cache.remove_match_failure(spotify_track['id'])
+                return track
+    await rate_limiter.acquire()
+    album_search = await asyncio.to_thread( _search_for_track_in_album )
+    if album_search:
+        return album_search
+    await rate_limiter.acquire()
+    track_search = await asyncio.to_thread( _search_for_standalone_track )
+    if track_search:
+        return track_search
+
+    # if none of the search modes succeeded then store the track id to the failure cache
+    failure_cache.cache_match_failure(spotify_track['id'])
+
+async def repeat_on_request_error(function, *args, remaining=5, **kwargs):
+    # utility to repeat calling the function up to 5 times if an exception is thrown
+    try:
+        return await function(*args, **kwargs)
+    except (tidalapi.exceptions.TooManyRequests, requests.exceptions.RequestException, spotipy.exceptions.SpotifyException) as e:
+        if remaining:
+            print(f"{str(e)} occurred, retrying {remaining} times")
+        else:
+            print(f"{str(e)} could not be recovered")
+
+        if isinstance(e, requests.exceptions.RequestException) and not e.response is None:
+            print(f"Response message: {e.response.text}")
+            print(f"Response headers: {e.response.headers}")
+
+        if not remaining:
+            print("Aborting sync")
+            print(f"The following arguments were provided:\n\n {str(args)}")
+            print(traceback.format_exc())
+            sys.exit(1)
+        sleep_schedule = {5: 1, 4:10, 3:60, 2:5*60, 1:10*60} # sleep variable length of time depending on retry number
+        time.sleep(sleep_schedule.get(remaining, 1))
+        return await repeat_on_request_error(function, *args, remaining=remaining-1, **kwargs)
+
+
+async def _fetch_all_from_spotify_in_chunks(fetch_function: Callable) -> List[dict]:
+    output = []
+    results = fetch_function(0)
+    output.extend([item['track'] for item in results['items'] if item['track'] is not None])
+
+    # Get all the remaining tracks in parallel
+    if results['next']:
+        offsets = [results['limit'] * n for n in range(1, math.ceil(results['total'] / results['limit']))]
+        extra_results = await atqdm.gather(
+            *[asyncio.to_thread(fetch_function, offset) for offset in offsets],
+            desc="Fetching additional data chunks"
+        )
+        for extra_result in extra_results:
+            output.extend([item['track'] for item in extra_result['items'] if item['track'] is not None])
+
+    return output
+
+
+async def get_tracks_from_spotify_playlist(spotify_session: spotipy.Spotify, spotify_playlist):
+    def _get_tracks_from_spotify_playlist(offset: int, playlist_id: str):
+        fields = "next,total,limit,items(track(name,album(name,artists),artists,track_number,duration_ms,id,external_ids(isrc))),type"
+        return spotify_session.playlist_tracks(playlist_id=playlist_id, fields=fields, offset=offset)
+
+    print(f"Loading tracks from Spotify playlist '{spotify_playlist['name']}'")
+    items = await repeat_on_request_error( _fetch_all_from_spotify_in_chunks, lambda offset: _get_tracks_from_spotify_playlist(offset=offset, playlist_id=spotify_playlist["id"]))
+    track_filter = lambda item: item.get('type', 'track') == 'track' # type may be 'episode' also
+    sanity_filter = lambda item: ('album' in item
+                                  and 'name' in item['album']
+                                  and 'artists' in item['album']
+                                  and len(item['album']['artists']) > 0
+                                  and item['album']['artists'][0]['name'] is not None)
+    return list(filter(sanity_filter, filter(track_filter, items)))
+
+def populate_track_match_cache(spotify_tracks_: Sequence[t_spotify.SpotifyTrack], tidal_tracks_: Sequence[tidalapi.Track]):
+    """ Populate the track match cache with all the existing tracks in Tidal playlist corresponding to Spotify playlist """
+    def _populate_one_track_from_spotify(spotify_track: t_spotify.SpotifyTrack):
+        for idx, tidal_track in list(enumerate(tidal_tracks)):
+            if tidal_track.available and match(tidal_track, spotify_track):
+                track_match_cache.insert((spotify_track['id'], tidal_track.id))
+                tidal_tracks.pop(idx)
+                return
+
+    def _populate_one_track_from_tidal(tidal_track: tidalapi.Track):
+        for idx, spotify_track in list(enumerate(spotify_tracks)):
+            if tidal_track.available and match(tidal_track, spotify_track):
+                track_match_cache.insert((spotify_track['id'], tidal_track.id))
+                spotify_tracks.pop(idx)
+                return
+
+    # make a copy of the tracks to avoid modifying original arrays
+    spotify_tracks = [t for t in spotify_tracks_]
+    tidal_tracks = [t for t in tidal_tracks_]
+
+    # first populate from the tidal tracks
+    for track in tidal_tracks:
+        _populate_one_track_from_tidal(track)
+    # then populate from the subset of Spotify tracks that didn't match (to account for many-to-one style mappings)
+    for track in spotify_tracks:
+        _populate_one_track_from_spotify(track)
+
+def get_new_spotify_tracks(spotify_tracks: Sequence[t_spotify.SpotifyTrack]) -> List[t_spotify.SpotifyTrack]:
+    ''' Extracts only the tracks that have not already been seen in our Tidal caches '''
+    results = []
+    for spotify_track in spotify_tracks:
+        if not spotify_track['id']: continue
+        if not track_match_cache.get(spotify_track['id']) and not failure_cache.has_match_failure(spotify_track['id']):
+            results.append(spotify_track)
+    return results
+
+def get_tracks_for_new_tidal_playlist(spotify_tracks: Sequence[t_spotify.SpotifyTrack]) -> Sequence[int]:
+    ''' gets list of corresponding tidal track ids for each spotify track, ignoring duplicates '''
+    output = []
+    seen_tracks = set()
+
+    for spotify_track in spotify_tracks:
+        if not spotify_track['id']: continue
+        tidal_id = track_match_cache.get(spotify_track['id'])
+        if tidal_id:
+            if tidal_id in seen_tracks:
+                track_name = spotify_track['name']
+                artist_names = ', '.join([artist['name'] for artist in spotify_track['artists']])
+                print(f'Duplicate found: Track "{track_name}" by {artist_names} will be ignored') 
+            else:
+                output.append(tidal_id)
+                seen_tracks.add(tidal_id)
+    return output
+
+async def search_new_tracks_on_tidal(tidal_session: tidalapi.Session, spotify_tracks: Sequence[t_spotify.SpotifyTrack], playlist_name: str, config: dict):
+    """ Generic function for searching for each item in a list of Spotify tracks which have not already been seen and adding them to the cache """
+    async def _run_rate_limiter(semaphore):
+        ''' Leaky bucket algorithm for rate limiting. Periodically releases items from semaphore at rate_limit'''
+        _sleep_time = config.get('max_concurrency', 10)/config.get('rate_limit', 10)/4 # aim to sleep approx time to drain 1/4 of 'bucket'
+        t0 = datetime.datetime.now()
+        while True:
+            await asyncio.sleep(_sleep_time)
+            t = datetime.datetime.now()
+            dt = (t - t0).total_seconds()
+            new_items = round(config.get('rate_limit', 10)*dt)
+            t0 = t
+            [semaphore.release() for i in range(new_items)] # leak new_items from the 'bucket'
+
+    # Extract the new tracks that do not already exist in the old tidal tracklist
+    tracks_to_search = get_new_spotify_tracks(spotify_tracks)
+    if not tracks_to_search:
+        return
+
+    # Search for each of the tracks on Tidal concurrently
+    task_description = "Searching Tidal for {}/{} tracks in Spotify playlist '{}'".format(len(tracks_to_search), len(spotify_tracks), playlist_name)
+    semaphore = asyncio.Semaphore(config.get('max_concurrency', 10))
+    rate_limiter_task = asyncio.create_task(_run_rate_limiter(semaphore))
+    search_results = await atqdm.gather( *[ repeat_on_request_error(tidal_search, t, semaphore, tidal_session) for t in tracks_to_search ], desc=task_description )
+    rate_limiter_task.cancel()
+
+    # Add the search results to the cache
+    song404 = []
+    for idx, spotify_track in enumerate(tracks_to_search):
+        if search_results[idx]:
+            track_match_cache.insert( (spotify_track['id'], search_results[idx].id) )
+        else:
+            song404.append(f"{spotify_track['id']}: {','.join([a['name'] for a in spotify_track['artists']])} - {spotify_track['name']}")
+            color = ('\033[91m', '\033[0m')
+            print(color[0] + "Could not find the track " + song404[-1] + color[1])
+    file_name = "songs not found.txt"
+    with open(file_name, "a", encoding="utf-8") as file:
+        for song in song404:
+            file.write(f"{song}\n")
+
+            
+async def sync_playlist(spotify_session: spotipy.Spotify, tidal_session: tidalapi.Session, spotify_playlist, tidal_playlist: tidalapi.Playlist | None, config: dict):
+    """ sync given playlist to tidal """
+    # Get the tracks from both Spotify and Tidal, creating a new Tidal playlist if necessary
+    spotify_tracks = await get_tracks_from_spotify_playlist(spotify_session, spotify_playlist)
+    if len(spotify_tracks) == 0:
+        return # nothing to do
+    if tidal_playlist:
+        old_tidal_tracks = await get_all_playlist_tracks(tidal_playlist)
+    else:
+        print(f"No playlist found on Tidal corresponding to Spotify playlist: '{spotify_playlist['name']}', creating new playlist")
+        tidal_playlist =  tidal_session.user.create_playlist(spotify_playlist['name'], spotify_playlist['description'])
+        old_tidal_tracks = []
+
+    # Extract the new tracks from the playlist that we haven't already seen before
+    populate_track_match_cache(spotify_tracks, old_tidal_tracks)
+    await search_new_tracks_on_tidal(tidal_session, spotify_tracks, spotify_playlist['name'], config)
+    new_tidal_track_ids = get_tracks_for_new_tidal_playlist(spotify_tracks)
+
+    # Update the Tidal playlist if there are changes
+    old_tidal_track_ids = [t.id for t in old_tidal_tracks]
+    if new_tidal_track_ids == old_tidal_track_ids:
+        print("No changes to write to Tidal playlist")
+    elif new_tidal_track_ids[:len(old_tidal_track_ids)] == old_tidal_track_ids:
+        # Append new tracks to the existing playlist if possible
+        add_multiple_tracks_to_playlist(tidal_playlist, new_tidal_track_ids[len(old_tidal_track_ids):])
+    else:
+        # Erase old playlist and add new tracks from scratch if any reordering occured
+        clear_tidal_playlist(tidal_playlist)
+        add_multiple_tracks_to_playlist(tidal_playlist, new_tidal_track_ids)
+
+async def sync_favorites(spotify_session: spotipy.Spotify, tidal_session: tidalapi.Session, config: dict):
+    """ sync user favorites to tidal """
+    async def get_tracks_from_spotify_favorites() -> List[dict]:
+        _get_favorite_tracks = lambda offset: spotify_session.current_user_saved_tracks(offset=offset)    
+        tracks = await repeat_on_request_error( _fetch_all_from_spotify_in_chunks, _get_favorite_tracks)
+        tracks.reverse()
+        return tracks
+
+    def get_new_tidal_favorites() -> List[int]:
+        existing_favorite_ids = set([track.id for track in old_tidal_tracks])
+        new_ids = []
+        for spotify_track in spotify_tracks:
+            match_id = track_match_cache.get(spotify_track['id'])
+            if match_id and not match_id in existing_favorite_ids:
+                new_ids.append(match_id)
+        return new_ids
+
+    print("Loading favorite tracks from Spotify")
+    spotify_tracks = await get_tracks_from_spotify_favorites()
+    print("Loading existing favorite tracks from Tidal")
+    old_tidal_tracks = await get_all_favorites(tidal_session.user.favorites, order='DATE')
+    populate_track_match_cache(spotify_tracks, old_tidal_tracks)
+    await search_new_tracks_on_tidal(tidal_session, spotify_tracks, "Favorites", config)
+    new_tidal_favorite_ids = get_new_tidal_favorites()
+    if new_tidal_favorite_ids:
+        for tidal_id in tqdm(new_tidal_favorite_ids, desc="Adding new tracks to Tidal favorites"):
+            tidal_session.user.favorites.add_track(tidal_id)
+    else:
+        print("No new tracks to add to Tidal favorites")
+
+def sync_playlists_wrapper(spotify_session: spotipy.Spotify, tidal_session: tidalapi.Session, playlists, config: dict):
+  for spotify_playlist, tidal_playlist in playlists:
+    # sync the spotify playlist to tidal
+    asyncio.run(sync_playlist(spotify_session, tidal_session, spotify_playlist, tidal_playlist, config) )
+
+def sync_favorites_wrapper(spotify_session: spotipy.Spotify, tidal_session: tidalapi.Session, config):
+    asyncio.run(main=sync_favorites(spotify_session=spotify_session, tidal_session=tidal_session, config=config))
+
+def get_tidal_playlists_wrapper(tidal_session: tidalapi.Session) -> Mapping[str, tidalapi.Playlist]:
+    tidal_playlists = asyncio.run(get_all_playlists(tidal_session.user))
+    return {playlist.name: playlist for playlist in tidal_playlists}
+
+def pick_tidal_playlist_for_spotify_playlist(spotify_playlist, tidal_playlists: Mapping[str, tidalapi.Playlist]):
+    if spotify_playlist['name'] in tidal_playlists:
+      # if there's an existing tidal playlist with the name of the current playlist then use that
+      tidal_playlist = tidal_playlists[spotify_playlist['name']]
+      return (spotify_playlist, tidal_playlist)
+    else:
+      return (spotify_playlist, None)
+
+def get_user_playlist_mappings(spotify_session: spotipy.Spotify, tidal_session: tidalapi.Session, config):
+    results = []
+    spotify_playlists = asyncio.run(get_playlists_from_spotify(spotify_session, config))
+    tidal_playlists = get_tidal_playlists_wrapper(tidal_session)
+    for spotify_playlist in spotify_playlists:
+        results.append( pick_tidal_playlist_for_spotify_playlist(spotify_playlist, tidal_playlists) )
+    return results
+
+async def get_playlists_from_spotify(spotify_session: spotipy.Spotify, config):
+    # get all the playlists from the Spotify account
+    playlists = []
+    print("Loading Spotify playlists")
+    first_results = spotify_session.current_user_playlists()
+    exclude_list = set([x.split(':')[-1] for x in config.get('excluded_playlists', [])])
+    playlists.extend([p for p in first_results['items']])
+    user_id = spotify_session.current_user()['id']
+
+    # get all the remaining playlists in parallel
+    if first_results['next']:
+        offsets = [ first_results['limit'] * n for n in range(1, math.ceil(first_results['total']/first_results['limit'])) ]
+        extra_results = await atqdm.gather( *[asyncio.to_thread(spotify_session.current_user_playlists, offset=offset) for offset in offsets ] )
+        for extra_result in extra_results:
+            playlists.extend([p for p in extra_result['items']])
+
+    # filter out playlists that don't belong to us or are on the exclude list
+    my_playlist_filter = lambda p: p and p['owner']['id'] == user_id
+    exclude_filter = lambda p: not p['id'] in exclude_list
+    return list(filter( exclude_filter, filter( my_playlist_filter, playlists )))
+
+def get_playlists_from_config(spotify_session: spotipy.Spotify, tidal_session: tidalapi.Session, config):
+    # get the list of playlist sync mappings from the configuration file
+    def get_playlist_ids(config):
+        return [(item['spotify_id'], item['tidal_id']) for item in config['sync_playlists']]
+    output = []
+    for spotify_id, tidal_id in get_playlist_ids(config=config):
+        try:
+            spotify_playlist = spotify_session.playlist(playlist_id=spotify_id)
+        except spotipy.SpotifyException as e:
+            print(f"Error getting Spotify playlist {spotify_id}")
+            raise e
+        try:
+            tidal_playlist = tidal_session.playlist(playlist_id=tidal_id)
+        except Exception as e:
+            print(f"Error getting Tidal playlist {tidal_id}")
+            raise e
+        output.append((spotify_playlist, tidal_playlist))
+    return output
+
+
+
+
+================================================
+FILE: src/spotify_to_tidal/tidalapi_patch.py
+================================================
+import asyncio
+import math
+from typing import List
+import tidalapi
+from tqdm import tqdm
+from tqdm.asyncio import tqdm as atqdm
+
+def _remove_indices_from_playlist(playlist: tidalapi.UserPlaylist, indices: List[int]):
+    headers = {'If-None-Match': playlist._etag}
+    index_string = ",".join(map(str, indices))
+    playlist.request.request('DELETE', (playlist._base_url + '/items/%s') % (playlist.id, index_string), headers=headers)
+    playlist._reparse()
+
+def clear_tidal_playlist(playlist: tidalapi.UserPlaylist, chunk_size: int=20):
+    with tqdm(desc="Erasing existing tracks from Tidal playlist", total=playlist.num_tracks) as progress:
+        while playlist.num_tracks:
+            indices = range(min(playlist.num_tracks, chunk_size))
+            _remove_indices_from_playlist(playlist, indices)
+            progress.update(len(indices))
+    
+def add_multiple_tracks_to_playlist(playlist: tidalapi.UserPlaylist, track_ids: List[int], chunk_size: int=20):
+    offset = 0
+    with tqdm(desc="Adding new tracks to Tidal playlist", total=len(track_ids)) as progress:
+        while offset < len(track_ids):
+            count = min(chunk_size, len(track_ids) - offset)
+            playlist.add(track_ids[offset:offset+chunk_size])
+            offset += count
+            progress.update(count)
+
+async def _get_all_chunks(url, session, parser, params={}) -> List[tidalapi.Track]:
+    """ 
+        Helper function to get all items from a Tidal endpoint in parallel
+        The main library doesn't provide the total number of items or expose the raw json, so use this wrapper instead
+    """
+    def _make_request(offset: int=0):
+        new_params = params
+        new_params['offset'] = offset
+        return session.request.map_request(url, params=new_params)
+
+    first_chunk_raw = _make_request()
+    limit = first_chunk_raw['limit']
+    total = first_chunk_raw['totalNumberOfItems']
+    items = session.request.map_json(first_chunk_raw, parse=parser)
+
+    if len(items) < total:
+        offsets = [limit * n for n in range(1, math.ceil(total/limit))]
+        extra_results = await atqdm.gather(
+                *[asyncio.to_thread(lambda offset: session.request.map_json(_make_request(offset), parse=parser), offset) for offset in offsets],
+            desc="Fetching additional data chunks"
+        )
+        for extra_result in extra_results:
+            items.extend(extra_result)
+    return items
+
+async def get_all_favorites(favorites: tidalapi.Favorites, order: str = "NAME", order_direction: str = "ASC", chunk_size: int=100) -> List[tidalapi.Track]:
+    """ Get all favorites from Tidal playlist in chunks """
+    params = {
+        "limit": chunk_size,
+        "order": order,
+        "orderDirection": order_direction,
+    }
+    return await _get_all_chunks(f"{favorites.base_url}/tracks", session=favorites.session, parser=favorites.session.parse_track, params=params)
+
+async def get_all_playlists(user: tidalapi.User, chunk_size: int=10) -> List[tidalapi.Playlist]:
+    """ Get all user playlists from Tidal in chunks """
+    print(f"Loading playlists from Tidal user")
+    params = {
+        "limit": chunk_size,
+    }
+    return await _get_all_chunks(f"users/{user.id}/playlists", session=user.session, parser=user.playlist.parse_factory, params=params)
+
+async def get_all_playlist_tracks(playlist: tidalapi.Playlist, chunk_size: int=20) -> List[tidalapi.Track]:
+    """ Get all tracks from Tidal playlist in chunks """
+    params = {
+        "limit": chunk_size,
+    }
+    print(f"Loading tracks from Tidal playlist '{playlist.name}'")
+    return await _get_all_chunks(f"{playlist._base_url%playlist.id}/tracks", session=playlist.session, parser=playlist.session.parse_track, params=params)
+
+
+
+
+================================================
+FILE: src/spotify_to_tidal/type/__init__.py
+================================================
+from .config import SpotifyConfig, TidalConfig, PlaylistConfig, SyncConfig
+from .spotify import SpotifyTrack
+
+from spotipy import Spotify
+from tidalapi import Session, Track
+
+TidalID = str
+SpotifyID = str
+TidalSession = Session
+TidalTrack = Track
+SpotifySession = Spotify
+
+__all__ = [
+    "SpotifyConfig",
+    "TidalConfig",
+    "PlaylistConfig",
+    "SyncConfig",
+    "TidalPlaylist",
+    "TidalID",
+    "SpotifyID",
+    "SpotifySession",
+    "TidalSession",
+    "TidalTrack",
+    "SpotifyTrack",
+]
+
+
+
+================================================
+FILE: src/spotify_to_tidal/type/config.py
+================================================
+from typing import TypedDict, Literal, List, Optional
+
+
+class SpotifyConfig(TypedDict):
+    client_id: str
+    client_secret: str
+    username: str
+    redirect_url: str
+
+
+class TidalConfig(TypedDict):
+    access_token: str
+    refresh_token: str
+    session_id: str
+    token_type: Literal["Bearer"]
+
+
+class PlaylistConfig(TypedDict):
+    spotify_id: str
+    tidal_id: str
+
+
+class SyncConfig(TypedDict):
+    spotify: SpotifyConfig
+    sync_playlists: Optional[List[PlaylistConfig]]
+    excluded_playlists: Optional[List[str]]
+
+
+
+================================================
+FILE: src/spotify_to_tidal/type/spotify.py
+================================================
+from spotipy import Spotify
+from typing import TypedDict, List, Dict, Mapping, Literal, Optional
+
+
+class SpotifyImage(TypedDict):
+    url: str
+    height: int
+    width: int
+
+
+class SpotifyFollower(TypedDict):
+    href: str
+    total: int
+
+
+SpotifyID = str
+SpotifySession = Spotify
+
+
+class SpotifyArtist(TypedDict):
+    external_urls: Mapping[str, str]
+    followers: SpotifyFollower
+    genres: List[str]
+    href: str
+    id: str
+    images: List[SpotifyImage]
+    name: str
+    popularity: int
+    type: str
+    uri: str
+
+
+class SpotifyAlbum(TypedDict):
+    album_type: Literal["album", "single", "compilation"]
+    total_tracks: int
+    available_markets: List[str]
+    external_urls: Dict[str, str]
+    href: str
+    id: str
+    images: List[SpotifyImage]
+    name: str
+    release_date: str
+    release_date_precision: Literal["year", "month", "day"]
+    restrictions: Optional[Dict[Literal["reason"], str]]
+    type: Literal["album"]
+    uri: str
+    artists: List[SpotifyArtist]
+
+
+class SpotifyTrack(TypedDict):
+    album: SpotifyAlbum
+    artists: List[SpotifyArtist]
+    available_markets: List[str]
+    disc_number: int
+    duration_ms: int
+    explicit: bool
+    external_ids: Dict[str, str]
+    external_urls: Dict[str, str]
+    href: str
+    id: str
+    is_playable: bool
+    linked_from: Dict
+    restrictions: Optional[Dict[Literal["reason"], str]]
+    name: str
+    popularity: int
+    preview_url: str
+    track_number: int
+    type: Literal["track"]
+    uri: str
+
+
+
+================================================
+FILE: tests/conftest.py
+================================================
+import sys
+import os
+
+# Add the src directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
+
+================================================
+FILE: tests/unit/__init__.py
+================================================
+[Empty file]
+
+
+================================================
+FILE: tests/unit/test_auth.py
+================================================
+# tests/unit/test_auth.py
+
+import pytest
+import spotipy
+import tidalapi
+import yaml
+import sys
+from unittest import mock
+from spotify_to_tidal.auth import open_spotify_session, open_tidal_session, SPOTIFY_SCOPES
+
+
+def test_open_spotify_session(mocker):
+    # Mock the SpotifyOAuth class
+    mock_spotify_oauth = mocker.patch(
+        "spotify_to_tidal.auth.spotipy.SpotifyOAuth", autospec=True
+    )
+    mock_spotify_instance = mocker.patch(
+        "spotify_to_tidal.auth.spotipy.Spotify", autospec=True
+    )
+
+    # Define a mock configuration
+    mock_config = {
+        "username": "test_user",
+        "client_id": "test_client_id",
+        "client_secret": "test_client_secret",
+        "redirect_uri": "http://127.0.0.1/",
+        "open_browser": True,
+    }
+
+    # Create a mock SpotifyOAuth instance
+    mock_oauth_instance = mock_spotify_oauth.return_value
+    mock_oauth_instance.get_access_token.return_value = "mock_access_token"
+
+    # Call the function under test
+    spotify_instance = open_spotify_session(mock_config)
+
+    # Assert that the SpotifyOAuth was called with correct parameters
+    mock_spotify_oauth.assert_called_once_with(
+        username="test_user",
+        scope=SPOTIFY_SCOPES,
+        client_id="test_client_id",
+        client_secret="test_client_secret",
+        redirect_uri="http://127.0.0.1/",
+        requests_timeout=2,
+        open_browser=True,
+    )
+
+    # Assert that the Spotify instance was created
+    mock_spotify_instance.assert_called_once_with(oauth_manager=mock_oauth_instance)
+    assert spotify_instance == mock_spotify_instance.return_value
+
+
+def test_open_spotify_session_oauth_error(mocker):
+    # Mock the SpotifyOAuth class and simulate an OAuth error
+    mock_spotify_oauth = mocker.patch(
+        "spotify_to_tidal.auth.spotipy.SpotifyOAuth", autospec=True
+    )
+    mock_spotify_oauth.return_value.get_access_token.side_effect = (
+        spotipy.SpotifyOauthError("mock error")
+    )
+
+    # Define a mock configuration
+    mock_config = {
+        "username": "test_user",
+        "client_id": "test_client_id",
+        "client_secret": "test_client_secret",
+        "redirect_uri": "http://127.0.0.1/",
+    }
+
+    # Mock sys.exit to prevent the test from exiting
+    mock_sys_exit = mocker.patch("sys.exit")
+
+    # Call the function under test and assert sys.exit is called
+    open_spotify_session(mock_config)
+    mock_sys_exit.assert_called_once()
+
+
+
+================================================
+FILE: tests/unit/test_cache.py
+================================================
+# tests/unit/test_cache.py
+
+import pytest
+import datetime
+import sqlalchemy
+from sqlalchemy import create_engine, select
+from unittest import mock
+from spotify_to_tidal.cache import MatchFailureDatabase, TrackMatchCache
+
+
+# Setup an in-memory SQLite database for testing
+@pytest.fixture
+def in_memory_db():
+    engine = create_engine("sqlite:///:memory:")
+    return engine
+
+
+# Test MatchFailureDatabase
+def test_cache_match_failure(in_memory_db, mocker):
+    mocker.patch(
+        "spotify_to_tidal.cache.sqlalchemy.create_engine", return_value=in_memory_db
+    )
+    failure_db = MatchFailureDatabase()
+
+    track_id = "test_track"
+    failure_db.cache_match_failure(track_id)
+
+    with failure_db.engine.connect() as connection:
+        result = connection.execute(
+            select(failure_db.match_failures).where(
+                failure_db.match_failures.c.track_id == track_id
+            )
+        ).fetchone()
+        assert result is not None
+        assert result.track_id == track_id
+
+
+def test_has_match_failure(in_memory_db, mocker):
+    mocker.patch(
+        "spotify_to_tidal.cache.sqlalchemy.create_engine", return_value=in_memory_db
+    )
+    failure_db = MatchFailureDatabase()
+
+    track_id = "test_track"
+    failure_db.cache_match_failure(track_id)
+
+    assert failure_db.has_match_failure(track_id) is True
+
+
+def test_remove_match_failure(in_memory_db, mocker):
+    mocker.patch(
+        "spotify_to_tidal.cache.sqlalchemy.create_engine", return_value=in_memory_db
+    )
+    failure_db = MatchFailureDatabase()
+
+    track_id = "test_track"
+    failure_db.cache_match_failure(track_id)
+    failure_db.remove_match_failure(track_id)
+
+    with failure_db.engine.connect() as connection:
+        result = connection.execute(
+            select(failure_db.match_failures).where(
+                failure_db.match_failures.c.track_id == track_id
+            )
+        ).fetchone()
+        assert result is None
+
+
+# Test TrackMatchCache
+def test_track_match_cache_insert():
+    track_cache = TrackMatchCache()
+    track_cache.insert(("spotify_id", 123))
+    assert track_cache.get("spotify_id") == 123
+
+
+def test_track_match_cache_get():
+    track_cache = TrackMatchCache()
+    track_cache.insert(("spotify_id", 123))
+    assert track_cache.get("spotify_id") == 123
+    assert track_cache.get("nonexistent_id") is None
+
